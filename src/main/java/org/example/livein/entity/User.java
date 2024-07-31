@@ -19,7 +19,7 @@ import java.util.List;
 public class User extends BaseEntity implements UserDetails {
 
 
-    @Column(nullable = false, length = 254)
+    @Column(nullable = false, unique = true, length = 254)
     private String email;
 
     @Column(nullable = false, length = 128)
@@ -35,7 +35,7 @@ public class User extends BaseEntity implements UserDetails {
     private OffsetDateTime lastLogin;
 
     @Column(name = "is_superuser")
-    private Boolean isSuperuser;
+    private Boolean isSuperUser;
 
     @Column(name = "is_staff")
     private Boolean isStaff;
@@ -46,7 +46,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "date_joined", columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
     private OffsetDateTime dateJoined;
 
-    @Column(length = 255)
     private String phone;
 
     @Column(name = "account_type", length = 10)
