@@ -2,6 +2,7 @@ package com.xcdm.livein.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.xcdm.livein.entity.abs.BaseEntity;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "shops")
 public class Shop extends BaseEntity {
 

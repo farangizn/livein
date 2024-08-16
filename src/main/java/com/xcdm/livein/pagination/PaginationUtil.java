@@ -8,17 +8,15 @@ public class PaginationUtil {
     public static <T> PaginatedResponse<T> paginate(
             List<T> items, int limit, int offset, String baseUrl) {
 
-        // Validate limit and offset
         if (limit <= 0) {
-            limit = 10; // Default limit
+            limit = 10;
         }
         if (offset < 0) {
-            offset = 0; // Default offset
+            offset = 0;
         }
 
         int totalItems = items.size();
 
-        // Calculate the indices for the sublist
         int fromIndex = Math.min(offset, totalItems);
         int toIndex = Math.min(offset + limit, totalItems);
 

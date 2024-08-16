@@ -46,7 +46,7 @@ public class TempUser extends BaseEntity implements UserDetails {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column(name = "date_joined", columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
+    @Column(name = "date_joined", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dateJoined;
 
     private String phone;

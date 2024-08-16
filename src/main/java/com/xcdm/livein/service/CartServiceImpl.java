@@ -2,7 +2,6 @@ package com.xcdm.livein.service;
 
 import com.xcdm.livein.dto.CartDTO;
 import lombok.RequiredArgsConstructor;
-import com.xcdm.livein.dto.CartItemCountDTO;
 import com.xcdm.livein.dto.CartItemDTO;
 import com.xcdm.livein.entity.Cart;
 import com.xcdm.livein.entity.CartItem;
@@ -49,7 +48,7 @@ public class CartServiceImpl implements CartService {
             CartItemDTO cartItemDTO = new CartItemDTO();
             cartItemDTO.setId(cartItem.getId());
             cartItemDTO.setQuantity(cartItem.getQuantity());
-//            cartItemDTO.setProduct(cartItem.getProduct().getId());
+            cartItemDTO.setProductId(cartItem.getProduct().getId());
             cartItemDTOs.add(cartItemDTO);
         }
 
@@ -67,20 +66,4 @@ public class CartServiceImpl implements CartService {
         return cartItemRepository.findById(id);
     }
 
-//    @Override
-//    public CartItemCountDTO formCartItemCountDTO(Cart cart) {
-//
-//        List<CartItem> cartItems = findCartItems(cart);
-//
-//        List<CartItemDTO> cartItemDTOs = new ArrayList<>();
-//        cartItems.forEach(cartItem ->  {
-//            CartItemDTO cartItemDTO = cartItemMapper.toDto(cartItem);
-//            cartItemDTOs.add(cartItemDTO);
-//        });
-//
-//        return CartItemCountDTO.builder()
-//                .results(cartItemDTOs)
-//                .count(cartItemDTOs.size())
-//                .build();
-//    }
 }

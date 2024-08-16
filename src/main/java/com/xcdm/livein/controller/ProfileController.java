@@ -2,24 +2,25 @@ package com.xcdm.livein.controller;
 
 import com.xcdm.livein.dto.*;
 import com.xcdm.livein.entity.*;
-import com.xcdm.livein.enums.Status;
+import com.xcdm.livein.entity.abs.BaseEntity;
 import com.xcdm.livein.interfaces.*;
 import com.xcdm.livein.mappers.*;
 import com.xcdm.livein.pagination.PaginatedResponse;
-import com.xcdm.livein.pagination.PaginationUtil;
 import com.xcdm.livein.repo.CartItemRepository;
-import com.xcdm.livein.repo.OrderItemRepository;
-import com.xcdm.livein.repo.OrderRepository;
-import com.xcdm.livein.repo.WishListRepository;
+import com.xcdm.livein.repo.CartRepository;
+import com.xcdm.livein.repo.UserRepository;
+import com.xcdm.livein.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth/profile")
@@ -34,15 +35,12 @@ public class ProfileController {
     private final CartItemReadMapper cartItemReadMapper;
     private final SearchHistoryService searchHistoryService;
     private final SearchHistoryMapper searchHistoryMapper;
-    private final OrderService orderService;
-    private final CartItemRepository cartItemRepository;
-    private final CartItemMapper cartItemMapper;
-    private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
-    private final OrderItemRepository orderItemRepository;
-    private final WishListRepository wishListRepository;
     private final WishlistService wishlistService;
-    private final WishListMapper wishListMapper;
+    private final OrderService orderService;
+    private final AuthService authService;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
 
 
     @GetMapping
@@ -52,13 +50,13 @@ public class ProfileController {
     }
 
     @PostMapping
-    public HttpEntity<UserProfileReadDTO> saveProfile(@RequestBody UserProfileCreateDTO userProfileCreateDTO) {
+    public HttpEntity<UserProfileReadDTO> saveProfile(@RequestBody @Valid UserProfileCreateDTO userProfileCreateDTO) {
         User user = profileService.saveProfile(userProfileCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toDto(user));
     }
 
     @PutMapping
-    public HttpEntity<UserProfileReadDTO> updateProfile(@RequestBody UserProfileCreateDTO userProfileCreateDTO) {
+    public HttpEntity<UserProfileReadDTO> updateProfile(@RequestBody @Valid UserProfileCreateDTO userProfileCreateDTO) {
         User user = userService.findByEmail(userProfileCreateDTO.getEmail());
         profileService.updateProfile(user, userProfileCreateDTO);
         return ResponseEntity.ok(userMapper.toDto(user));
@@ -66,9 +64,9 @@ public class ProfileController {
 
     @DeleteMapping
     public HttpEntity<?> deleteProfile() {
-        User currentUser = userService.getCurrentUser();
-        userService.delete(currentUser);
-        return ResponseEntity.status(204).build();
+//        User currentUser = userService.getCurrentUser();
+//        userRepository.delete(currentUser);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("my-cart")
@@ -81,60 +79,44 @@ public class ProfileController {
     public HttpEntity<?> deleteMyCart() {
         Cart currentUsersCart = cartService.findCurrentUsersCart();
         cartService.delete(currentUsersCart);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Cart deleted successfully");
     }
 
     @GetMapping("my-cart/items")
     public HttpEntity<PaginatedResponse<CartItemDTO>> getCartItems(@RequestParam(value = "limit", defaultValue = "10") int limit,
-                                                                       @RequestParam(value = "offset", defaultValue = "0") int offset,
-                                                                       HttpServletRequest request) {
-        List<CartItemDTO> cartItemDTOS = cartItemRepository.findAll()
-                .stream()
-                .map(cartItemMapper::toDto)
-                .toList();
-
-        String baseUrl = request.getRequestURI();
-
-        PaginatedResponse<CartItemDTO> response = PaginationUtil.paginate(cartItemDTOS, limit, offset, baseUrl);
-
-        return ResponseEntity.ok(response);
+                                                                   @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                                                   HttpServletRequest request) {
+        return cartItemService.getCartItems(limit, offset, request);
     }
 
     @PostMapping("my-cart/items")
-    public HttpEntity<CartItemReadDTO> saveCartItems(@RequestBody CartItemSaveDTO cartItemSaveDTO) {
-        CartItem cartItem = cartItemService.saveCartItem(cartItemSaveDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartItemReadMapper.toDto(cartItem));
+    public HttpEntity<?> saveCartItems(@RequestBody CartItemCreateDTO cartItemCreateDTO) {
+        CartItem cartItem = cartItemService.saveCartItem(cartItemCreateDTO);
+        if (cartItem != null) {
+            CartItemReadDTO dto = cartItemReadMapper.toDto(cartItem);
+            dto.setProductId(cartItem.getProduct().getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        } else {
+            return ResponseEntity.badRequest().body("Product with id " + cartItemCreateDTO.getProductId() + " does not exist");
+        }
     }
 
     @GetMapping("my-cart/items/{id}")
-    public HttpEntity<CartItemReadDTO> getMyCartItem(@PathVariable Integer id) {
-        Optional<CartItem> cartItemOpt = cartItemService.findById(id);
-
-        if (cartItemOpt.isPresent()) {
-            CartItemReadDTO dto = cartItemReadMapper.toDto(cartItemOpt.get());
-            return ResponseEntity.ok(dto);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public HttpEntity<?> getMyCartItem(@PathVariable Integer id) {
+        return cartItemService.getCartItem(id);
     }
 
     @DeleteMapping("my-cart/items/{id}")
     public HttpEntity<?> deleteCartItem(@PathVariable Integer id) {
-        Optional<CartItem> cartItemOptional = cartService.findById(id);
-        if (cartItemOptional.isPresent()) {
-            cartItemService.delete(cartItemOptional.get());
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return cartItemService.deleteById(id);
     }
 
-    @GetMapping("my-history") // list or single?
+    @GetMapping("my-history")
     public HttpEntity<List<SearchHistoryReadDTO>> getMyHistory() {
         return ResponseEntity.ok( searchHistoryService.getSearchHistory());
     }
 
-    @PostMapping("my-history") /////////////////////////////////////
+    @PostMapping("my-history")
     public HttpEntity<SearchHistoryReadDTO> saveSearchHistory(@RequestParam String text) {
         User currentUser = userService.getCurrentUser();
         SearchHistory searchHistory = searchHistoryService.save(new SearchHistory(text, currentUser));
@@ -145,38 +127,17 @@ public class ProfileController {
     public HttpEntity<PaginatedResponse<OrderDTO>> getMyOrders(@RequestParam(value = "limit", defaultValue = "10") int limit,
                                                                    @RequestParam(value = "offset", defaultValue = "0") int offset,
                                                                    HttpServletRequest request) {
-        List<OrderDTO> orderDTOS = orderRepository.findAllByUser(userService.getCurrentUser())
-                .stream()
-                .map(orderMapper::toDto)
-                .toList();
-
-        String baseUrl = request.getRequestURI();
-
-        PaginatedResponse<OrderDTO> response = PaginationUtil.paginate(orderDTOS, limit, offset, baseUrl);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(orderService.getOrdersAndFormResult(limit, offset, request));
     }
 
-    @PostMapping("my-orders") // RAW
+    @PostMapping("my-orders")
     public HttpEntity<OrderDTO> saveOrder() {
-        User currentUser = userService.getCurrentUser();
-        Cart currentUsersCart = cartService.findCurrentUsersCart();
-        List<CartItem> cartItems = cartItemRepository.findByCart(currentUsersCart);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.saveOrder());
+    }
 
-        Order order = Order.builder()
-                .user(currentUser)
-                .status(Status.NEW)
-                .build();
-        orderRepository.save(order);
-
-        OrderDTO orderDTO = OrderDTO.builder().cartItems(cartItems).build();
-
-        cartItems.forEach(c -> {
-            OrderItem orderItem = OrderItem.builder().product(c.getProduct()).quantity(c.getQuantity()).order(order).build();
-            orderItemRepository.save(orderItem);
-        });
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
+    @PostMapping("/set-password")
+    public HttpEntity<?> setPassword(@RequestBody @Valid PasswordDTO passwordDTO) {
+        return authService.changePassword(passwordDTO);
     }
 
     @GetMapping("wishlist")
@@ -184,50 +145,23 @@ public class ProfileController {
                                     @RequestParam(value = "offset", defaultValue = "0") int offset,
                                     HttpServletRequest request) {
 
-        User currentUser = userService.getCurrentUser();
-        List<WishList> wishLists = wishlistService.findByUser(currentUser);
-
-        List<WishlistDTO> wishlistDTOS = wishListRepository.findByUser(userService.getCurrentUser())
-                .stream()
-                .map(wishListMapper::toDto)
-                .toList();
-
-        String baseUrl = request.getRequestURI();
-
-        PaginatedResponse<WishlistDTO> response = PaginationUtil.paginate(wishlistDTOS, limit, offset, baseUrl);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(wishlistService.getWishList(limit, offset, request));
 
     }
 
     @PostMapping("wishlist")
-    public HttpEntity<WishlistDTO> saveWishlist(@RequestBody Product product) {
-        User currentUser = userService.getCurrentUser();
-        WishList wishList = WishList.builder().user(currentUser).product(product).build();
-        wishListRepository.save(wishList);
-
-        return ResponseEntity.ok(wishListMapper.toDto(wishList));
+    public HttpEntity<WishlistDTO> saveWishlist(@RequestParam Integer productId) {
+        return wishlistService.saveWishlist(productId);
     }
 
     @GetMapping("wishlist/{product_id}")
-    public HttpEntity<WishlistDTO> getWishlistByProductId(@PathVariable Integer product_id) {
-        Optional<WishList> wishListOptional = wishlistService.findByProductId(product_id);
-
-        return wishListOptional.map(wishList -> ResponseEntity.ok(wishListMapper.toDto(wishList))).orElseGet(() -> ResponseEntity.notFound().build());
+    public HttpEntity<?> getWishlistByProductId(@PathVariable Integer product_id) {
+        return wishlistService.getWishlistByProductId(product_id);
     }
 
     @DeleteMapping("wishlist/{product_id}")
     public HttpEntity<?> deleteWishlist(@PathVariable Integer product_id) {
-        Optional<Product> productOptional = profileService.findById(product_id);
-
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
-            wishlistService.deleteProductFromWishlist(product);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-
+        return wishlistService.deleteWishlistProduct(product_id);
     }
 
 

@@ -16,7 +16,7 @@ public class JwtUtil {
     public String generateAccessToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
-                .issuer("Muhammad's Production")
+                .issuer("Farangiz's Production")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours expiration
                 .signWith(secretKey())
@@ -26,7 +26,7 @@ public class JwtUtil {
     public String generateRefreshToken(LoginDTO logInDTO) {
         return Jwts.builder()
                 .subject(logInDTO.getEmail())
-                .issuer("Muhammad's Production")
+                .issuer("Farangiz's Production")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 2)) // 48 hours expiration
                 .signWith(secretKey())

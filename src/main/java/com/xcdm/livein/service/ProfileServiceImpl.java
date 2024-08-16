@@ -3,6 +3,7 @@ package com.xcdm.livein.service;
 import com.xcdm.livein.entity.Product;
 import com.xcdm.livein.interfaces.ProfileService;
 import com.xcdm.livein.repo.ProductRepository;
+import com.xcdm.livein.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import com.xcdm.livein.dto.UserProfileCreateDTO;
 import com.xcdm.livein.entity.User;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void updateProfile(User user, UserProfileCreateDTO userProfileCreateDTO) {
@@ -32,19 +34,25 @@ public class ProfileServiceImpl implements ProfileService {
         if (userProfileCreateDTO.getLastName() != null) {
             user.setLastName(userProfileCreateDTO.getLastName());
         }
+
+        userRepository.save(user);
+
     }
 
     @Override
     public User saveProfile(UserProfileCreateDTO userProfileCreateDTO) {
-        return User.builder()
+        User user = User.builder()
                 .firstName(userProfileCreateDTO.getFirstName())
                 .lastName(userProfileCreateDTO.getLastName())
                 .email(userProfileCreateDTO.getEmail())
                 .phone(userProfileCreateDTO.getPhone())
                 .isSuperUser(false)
+                .isActive(false)
                 .dateJoined(ZonedDateTime.now())
-                .lastLogin(ZonedDateTime.now())
+                .isStaff(false)
                 .build();
+        userRepository.save(user);
+        return user;
     }
 
     @Override

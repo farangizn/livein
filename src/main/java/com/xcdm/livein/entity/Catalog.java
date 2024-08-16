@@ -4,6 +4,7 @@ import com.xcdm.livein.entity.abs.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,6 +16,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Catalog extends BaseEntity {
 
     private String name;
@@ -30,7 +32,7 @@ public class Catalog extends BaseEntity {
     @Column(length = 100)
     private String banner;
 
-//    private String parentId;
+    private Integer parentId;
 
     @CreationTimestamp
     private ZonedDateTime createdAt;

@@ -1,23 +1,21 @@
 package com.xcdm.livein.entity;
 
+import com.xcdm.livein.entity.abs.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.xcdm.livein.entity.abs.BaseEntity;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
-public class ShopShowroomProduct extends BaseEntity {
-
-    private Number x;
-    private Number y;
-
+public class ShowroomProduct extends BaseEntity {
     @ManyToOne
     private Product product;
-
-
+    @ManyToOne
+    private Showroom showroom;
 }

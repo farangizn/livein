@@ -1,10 +1,12 @@
 package com.xcdm.livein.security;
 
+import com.xcdm.livein.enums.RoleName;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import com.xcdm.livein.filters.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -25,18 +27,21 @@ public class SecurityConfig {
     @SneakyThrows
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
-        // disabling CSRF
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
-        // securing apis
         httpSecurity.authorizeHttpRequests(m -> {
-            m.requestMatchers(
-                    "/api/auth/**",
-                    "/authenticate", "/register",
+            m
+                    .requestMatchers(
+                    "/auth/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html").permitAll();
-            m.anyRequest().authenticated();
+                    "/swagger-ui.html",
+                            "/districts/**",
+                            "/regions/**", "/regions", "/districts", "/application/**", "/application"
+                            ).permitAll()
+//                    .requestMatchers("").hasAnyRole("ADMIN", "SUPERUSER")
+//                            .requestMatchers("").hasAnyRole("ADMIN", "USER", "SUPERUSER")
+            .anyRequest().authenticated();
         });
 
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

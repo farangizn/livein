@@ -1,6 +1,5 @@
 package com.xcdm.livein.controller;
 
-import com.xcdm.livein.entity.Region;
 import com.xcdm.livein.interfaces.RegionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -18,15 +17,11 @@ public class RegionController {
     private final RegionService regionService;
 
     @GetMapping
-    public HttpEntity<Region> getRegion(@RequestParam String name) {
-
-        Region region = regionService.findByName(name);
-
-        if (region != null) {
-            return ResponseEntity.ok(regionService.findByName(name));
+    public HttpEntity<?> getRegion(@RequestParam(required = false) String name) {
+        if (name == null) {
+            return ResponseEntity.ok(regionService.getRegions());
         } else {
-            return ResponseEntity.notFound().build();
+            return regionService.getRegion(name);
         }
-
     }
 }

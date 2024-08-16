@@ -1,7 +1,6 @@
 package com.xcdm.livein.interfaces;
 
 import com.xcdm.livein.dto.CartDTO;
-import com.xcdm.livein.dto.CartItemCountDTO;
 import com.xcdm.livein.entity.Cart;
 import com.xcdm.livein.entity.CartItem;
 import org.springframework.stereotype.Service;

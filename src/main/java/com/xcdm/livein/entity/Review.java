@@ -1,9 +1,11 @@
 package com.xcdm.livein.entity;
 
+import com.xcdm.livein.enums.Rate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.xcdm.livein.entity.abs.BaseEntity;
@@ -16,9 +18,10 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Review extends BaseEntity {
 
-    private Integer rate;
+    private Rate rate;
 
     @Column(columnDefinition = "TEXT")
     private String text;

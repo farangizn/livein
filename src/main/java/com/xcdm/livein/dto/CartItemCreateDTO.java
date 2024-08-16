@@ -9,10 +9,10 @@ import com.xcdm.livein.entity.Product;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartItemSaveDTO {
+public class CartItemCreateDTO {
 
-    private Product product;
-//    private Integer product;
+    private Integer productId;
+//    private Product product;
     private Integer quantity;
 
 }

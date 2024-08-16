@@ -1,11 +1,12 @@
 package com.xcdm.livein.dto;
 
-import com.xcdm.livein.entity.Region;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DistrictDTO {
@@ -14,7 +15,7 @@ public class DistrictDTO {
     private String nameOz;
     private String nameRu;
     private String nameEn;
-//    private Integer regionId;
-    private Region region;
+    private Integer regionId;
+//    private Region region;
 
 }

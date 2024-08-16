@@ -1,7 +1,5 @@
 package com.xcdm.livein.dto;
 
-import com.xcdm.livein.entity.Product;
-import com.xcdm.livein.entity.Shop;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,9 +10,9 @@ import java.util.List;
 public class ShowroomDTO {
 
     private Integer id;
-    private List<Product> products;
+    private List<String> products;
     private String banner;
     private String position;
-    private Shop shop;
+    private Integer shopId;
 
 }

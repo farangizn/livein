@@ -1,6 +1,5 @@
 package com.xcdm.livein.dto;
 
-import com.xcdm.livein.entity.CartItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +17,5 @@ public class OrderDTO {
     private Integer id;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
-    private List<CartItem> cartItems;
+    private List<OrderItemDTO> cartItems;
 }

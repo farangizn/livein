@@ -1,5 +1,6 @@
 package com.xcdm.livein.security;
 
+import com.xcdm.livein.entity.User;
 import com.xcdm.livein.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,4 +18,5 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email);
     }
+
 }

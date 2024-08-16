@@ -26,7 +26,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false, unique = true, length = 254)
     private String email;
 
-    @Column(nullable = false, length = 128)
+    @Column(length = 128)
     private String password;
 
     @Column(name = "first_name", nullable = false, length = 150)
@@ -47,7 +47,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column(name = "date_joined", columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
+    @Column(name = "date_joined", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime dateJoined;
 
     private String phone;
@@ -59,9 +59,32 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 100)
     private String avatar;
 
+    @ManyToMany(fetch = FetchType.EAGER) // manyToMany is lazy by default, this gives an error in spring security
+    private List<Role> roles;
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return this.roles;
     }
 
     @Override

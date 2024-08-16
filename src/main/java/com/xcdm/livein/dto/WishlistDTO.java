@@ -1,6 +1,5 @@
 package com.xcdm.livein.dto;
 
-import com.xcdm.livein.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +13,8 @@ import java.time.ZonedDateTime;
 @Builder
 public class WishlistDTO {
     private Integer id;
-    private Product product;
-//    private Integer product;
+//    private Product product;
+    private Integer productId;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 }
